@@ -15,12 +15,15 @@ const Item = ({ item, onPress, buyer_id, increaseCartCount }) => {
         const item_id = item.item_id;
         const price = item.unit_price;
 
-        const response = await axios.post(`http://192.168.234.167:5001/cart`, {
-          buyer_id: buyer_id,
-          item_id: item_id,
-          quantity: 1,
-          price: price,
-        });
+        const response = await axios.post(
+          `http://backend-rho-three-58.vercel.app/cart`,
+          {
+            buyer_id: buyer_id,
+            item_id: item_id,
+            quantity: 1,
+            price: price,
+          }
+        );
 
         alert("Item successfully added to the cart");
         increaseCartCount();

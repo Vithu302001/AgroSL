@@ -46,7 +46,7 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
           setLoading(true);
           try {
             const response = await axios.get(
-              `http://192.168.234.167:5001/cartWithSellerName/${currentUser.uid}`
+              `http://backend-rho-three-58.vercel.app/cartWithSellerName/${currentUser.uid}`
             );
             setCartItems(response.data); // Update the cart items from the backend
             updateTotalPrice(
@@ -78,7 +78,7 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
   const handleDelete = async (rowKey, itemId) => {
     try {
       await axios.delete(
-        `http://192.168.234.167:5001/cart/${currentUser.uid}/${itemId}`
+        `http://backend-rho-three-58.vercel.app/cart/${currentUser.uid}/${itemId}`
       );
       const newCartItems = cartItems.filter(
         (_, index) => index !== parseInt(rowKey, 10)

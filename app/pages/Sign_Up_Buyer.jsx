@@ -92,8 +92,8 @@ const Sign_Up_Buyer = () => {
         user_type: "buyer",
       };
 
-      await axios.post("http://192.168.234.167:5001/users", newUser);
-      await axios.post("http://192.168.234.167:5001/buyer", newUser);
+      await axios.post("http://backend-rho-three-58.vercel.app/users", newUser);
+      await axios.post("http://backend-rho-three-58.vercel.app/buyer", newUser);
 
       Alert.alert("Account created successfully");
       clearFields();

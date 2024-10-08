@@ -43,7 +43,7 @@ const ComplaintPage = () => {
 
     try {
       const response = await axios.post(
-        "http://192.168.234.167:5001/api/complaints",
+        "http://backend-rho-three-58.vercel.app/api/complaints",
         {
           buyer_id: buyerId,
           description,

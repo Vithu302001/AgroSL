@@ -73,8 +73,11 @@ const Sign_Up_Seller = () => {
         store_name: storeName,
       };
 
-      await axios.post("http://192.168.234.167:5001/users", newUser);
-      await axios.post("http://192.168.234.167:5001/sellers", newSeller);
+      await axios.post("http://backend-rho-three-58.vercel.app/users", newUser);
+      await axios.post(
+        "http://backend-rho-three-58.vercel.app/sellers",
+        newSeller
+      );
       Alert.alert("Success", "Account created successfully");
       navigation.navigate("Sign_In");
     } catch (error) {

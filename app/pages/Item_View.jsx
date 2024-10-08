@@ -39,7 +39,7 @@ const Item_View = () => {
     const fetchItem = async () => {
       try {
         const res = await axios.get(
-          `http://192.168.234.167:5001/items/${itemID}`
+          `http://backend-rho-three-58.vercel.app/items/${itemID}`
         );
         setItem(res.data[0]);
       } catch (err) {
@@ -57,7 +57,7 @@ const Item_View = () => {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(
-          `http://192.168.234.167:5001/reviews/${itemID}`
+          `http://backend-rho-three-58.vercel.app/reviews/${itemID}`
         );
         setReviews(response.data);
       } catch (error) {
@@ -73,7 +73,7 @@ const Item_View = () => {
     if (comment.trim() && rating > 0) {
       try {
         const response = await axios.post(
-          "http://192.168.234.167:5001/reviews",
+          "http://backend-rho-three-58.vercel.app/reviews",
           {
             item_id: itemID,
             description: comment,
@@ -113,12 +113,15 @@ const Item_View = () => {
     }
 
     try {
-      const response = await axios.post(`http://192.168.234.167:5001/cart`, {
-        buyer_id: userID,
-        item_id: item.item_id,
-        quantity,
-        price: item.unit_price,
-      });
+      const response = await axios.post(
+        `http://backend-rho-three-58.vercel.app/cart`,
+        {
+          buyer_id: userID,
+          item_id: item.item_id,
+          quantity,
+          price: item.unit_price,
+        }
+      );
 
       alert("Item successfully added to the cart");
       navigation.navigate("Cart");

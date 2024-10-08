@@ -44,7 +44,7 @@ const BuyerOrders = () => {
       console.log("Fetching orders for buyer_id: ", buyerId);
       try {
         const response = await axios.get(
-          `http://192.168.234.167:5001/api/orders_for_buyers/${buyerId}`
+          `http://backend-rho-three-58.vercel.app/api/orders_for_buyers/${buyerId}`
         );
 
         const data = response.data;
@@ -58,7 +58,7 @@ const BuyerOrders = () => {
           filteredData.map(async (order) => {
             try {
               const itemResponse = await axios.get(
-                `http://192.168.234.167:5001/items/${order.item_id}`
+                `http://backend-rho-three-58.vercel.app/items/${order.item_id}`
               );
               const itemData = itemResponse.data[0];
               return { ...order, item_image: itemData.image_url };

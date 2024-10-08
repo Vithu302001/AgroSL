@@ -70,7 +70,9 @@ const Home = () => {
     const fetchItems = async () => {
       setLoading(true); // Set loading to true while fetching
       try {
-        const response = await axios.get("http://192.168.234.167:5001/items");
+        const response = await axios.get(
+          "http://backend-rho-three-58.vercel.app/items"
+        );
         console.log(response.data);
         setItems(response.data);
       } catch (error) {
@@ -88,7 +90,9 @@ const Home = () => {
     const fetchCartItems = async () => {
       try {
         const response1 = await axios.get(
-          `http://192.168.234.167:5001/cart/${userID ? userID : null}`
+          `http://backend-rho-three-58.vercel.app/cart/${
+            userID ? userID : null
+          }`
         );
 
         console.log(response1.data);

@@ -37,7 +37,9 @@ const Profile = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         axios
-          .get(`http://192.168.234.167:5001/users/${currentUser.uid}`)
+          .get(
+            `http://backend-rho-three-58.vercel.app/users/${currentUser.uid}`
+          )
           .then((res) => {
             setUser(res.data);
             setUpdatedUser(res.data);
@@ -69,7 +71,7 @@ const Profile = () => {
     if (updatedUser?.address_id) {
       axios
         .get(
-          `http://192.168.234.167:5001/get_user_address/${updatedUser.user_id}`
+          `http://backend-rho-three-58.vercel.app/get_user_address/${updatedUser.user_id}`
         )
         .then((res) => {
           setAddressup({
@@ -115,7 +117,10 @@ const Profile = () => {
     };
     console.log(combinedData);
     axios
-      .put(`http://192.168.234.167:5001/users/${user.user_id}`, combinedData) // Ensure correct ID usage
+      .put(
+        `http://backend-rho-three-58.vercel.app/users/${user.user_id}`,
+        combinedData
+      ) // Ensure correct ID usage
       .then((res) => {
         setUser(res.data);
         setUpdatedUser(res.data);

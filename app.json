@@ -18,10 +18,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/AgroSL.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.vithu30.AgroSL"
     },
     "web": {
       "favicon": "./assets/images/AgroSL.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "c0c5204e-7944-439a-bcdc-45a4d8b514f1"
+      }
     }
   }
 }
