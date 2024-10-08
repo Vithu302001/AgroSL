@@ -6,7 +6,16 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "API_KEY": "AIzaSyA6G7lILKQ9c3MQ0umcmi-4RW4r72zkOFk",
+        "AUTH_DOMAIN": "agrosl-7abb2.firebaseapp.com",
+        "PROJECT_ID": "agrosl-7abb2",
+        "STORAGE_BUCKET": "agrosl-7abb2.appspot.com",
+        "MESSAGING_SENDER_ID": "321966335054",
+        "APP_ID": "1:321966335054:web:33f8ab854a66403434cf1f",
+        "MEASUREMENT_ID": "G-SZKME5P15M"
+      }
     },
     "preview": {
       "ios": {
@@ -14,6 +23,26 @@
       },
       "android": {
         "buildType": "apk"
+      },
+      "env": {
+        "API_KEY": "AIzaSyA6G7lILKQ9c3MQ0umcmi-4RW4r72zkOFk",
+        "AUTH_DOMAIN": "agrosl-7abb2.firebaseapp.com",
+        "PROJECT_ID": "agrosl-7abb2",
+        "STORAGE_BUCKET": "agrosl-7abb2.appspot.com",
+        "MESSAGING_SENDER_ID": "321966335054",
+        "APP_ID": "1:321966335054:web:33f8ab854a66403434cf1f",
+        "MEASUREMENT_ID": "G-SZKME5P15M"
+      }
+    },
+    "production": {
+      "env": {
+        "API_KEY": "AIzaSyA6G7lILKQ9c3MQ0umcmi-4RW4r72zkOFk",
+        "AUTH_DOMAIN": "agrosl-7abb2.firebaseapp.com",
+        "PROJECT_ID": "agrosl-7abb2",
+        "STORAGE_BUCKET": "agrosl-7abb2.appspot.com",
+        "MESSAGING_SENDER_ID": "321966335054",
+        "APP_ID": "1:321966335054:web:33f8ab854a66403434cf1f",
+        "MEASUREMENT_ID": "G-SZKME5P15M"
       }
     }
   },
