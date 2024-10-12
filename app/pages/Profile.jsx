@@ -13,9 +13,11 @@ import {
 import axios from "axios";
 import logo from "../../assets/images/AgroSL.png";
 import colors from "../../constants/colors";
-import { auth } from "../../Backend/firebase"; // Ensure firebase is properly configured
+import { auth } from "../../Backend/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
+
+const BASE_URL = "http://backend-rho-three-58.vercel.app";
 
 const Profile = () => {
   const [isEditable, setIsEditable] = useState(false);
@@ -33,59 +35,59 @@ const Profile = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    // Listen for authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        axios
-          .get(
-            `http://backend-rho-three-58.vercel.app/users/${currentUser.uid}`
-          )
-          .then((res) => {
-            setUser(res.data);
-            setUpdatedUser(res.data);
-          })
-          .catch((err) => {
-            setError(err.message);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
+        fetchUserData(currentUser.uid);
       } else {
-        setUser(null);
-        setUpdatedUser({
-          pb_number: "Not set yet",
-          street_name: "Not set yet",
-          city: "Not set yet",
-          district: "Not set yet",
-        });
-        setAddressup({});
-        setLoading(false);
+        resetUserData();
       }
     });
 
-    // Cleanup the listener on unmount
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    if (updatedUser?.address_id) {
-      axios
-        .get(
-          `http://backend-rho-three-58.vercel.app/get_user_address/${updatedUser.user_id}`
-        )
-        .then((res) => {
-          setAddressup({
-            pb_number: res.data.user_address.pb_number || "Not set yet",
-            street_name: res.data.user_address.street_name || "Not set yet",
-            city: res.data.user_address.city || "Not set yet",
-            district: res.data.user_address.district || "Not set yet",
-          });
-        })
-        .catch((err) => {
-          setError(err.message);
-        });
+  const fetchUserData = async (uid) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/users/${uid}`);
+      setUser(res.data);
+      setUpdatedUser(res.data);
+      if (res.data.address_id) {
+        fetchUserAddress(res.data.user_id);
+      }
+    } catch (err) {
+      setError(err.message);
+      Alert.alert("Error", err.message);
+    } finally {
+      setLoading(false);
     }
-  }, [updatedUser]);
+  };
+
+  const fetchUserAddress = async (userId) => {
+    try {
+      const res = await axios.get(`${BASE_URL}/get_user_address/${userId}`);
+      setAddressup({
+        pb_number: res.data.user_address.pb_number || "Not set yet",
+        street_name: res.data.user_address.street_name || "Not set yet",
+        city: res.data.user_address.city || "Not set yet",
+        district: res.data.user_address.district || "Not set yet",
+      });
+    } catch (err) {
+      setError(err.message);
+      Alert.alert("Error", err.message);
+    }
+  };
+
+  const resetUserData = () => {
+    setUser(null);
+    setUpdatedUser({
+      pb_number: "Not set yet",
+      street_name: "Not set yet",
+      city: "Not set yet",
+      district: "Not set yet",
+    });
+    setAddressup({});
+    setLoading(false);
+  };
 
   const handleInputChange = (name, value) => {
     setUpdatedUser((prevUser) => ({
@@ -95,41 +97,35 @@ const Profile = () => {
   };
 
   const handleAddressChange = (name, value) => {
-    console.log(name, value);
     setAddressup((prevAddress) => ({
       ...prevAddress,
       [name]: value,
     }));
   };
 
-  useEffect(() => {
-    console.log("Updated address:", addressup);
-  }, [addressup]);
-
   const handleEdit = () => {
     setIsEditable(true);
   };
 
-  const handleSaveClick = () => {
+  const handleSaveClick = async () => {
     const combinedData = {
       ...updatedUser,
       addressup: addressup,
     };
-    console.log(combinedData);
-    axios
-      .put(
-        `http://backend-rho-three-58.vercel.app/users/${user.user_id}`,
+
+    try {
+      const res = await axios.put(
+        `${BASE_URL}/users/${user.user_id}`,
         combinedData
-      ) // Ensure correct ID usage
-      .then((res) => {
-        setUser(res.data);
-        setUpdatedUser(res.data);
-        setIsEditable(false);
-        setError(null); // Clear error on success
-      })
-      .catch((err) => {
-        setError(err.message);
-      });
+      );
+      setUser(res.data);
+      setUpdatedUser(res.data);
+      setIsEditable(false);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      Alert.alert("Error", err.message);
+    }
   };
 
   if (loading) {
@@ -141,78 +137,61 @@ const Profile = () => {
     );
   }
 
-  if (!user) {
-    return Alert.alert(
-      "User Not Signed In",
-      "Please sign in to continue.",
-      [
-        {
-          text: "Cancel",
-          onPress: () => console.log("Cancel Pressed"), // Handle cancel
-          style: "cancel",
-        },
-        {
-          text: "Sign In",
-          onPress: () => {
-            // Navigate to sign-in screen (adjust the navigation logic as needed)
-            navigation.navigate("Sign_In"); // Replace 'SignIn' with your actual sign-in screen name
-          },
-        },
-      ],
-      { cancelable: false }
-    );
-  }
-
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Text style={styles.greeting}>Hi! {user?.first_name || "User"}</Text>
-        <Image source={logo} style={styles.avatar} />
-
-        {/* User Input Fields */}
-        {["first_name", "last_name", "email", "mobile_number"].map(
-          (field, index) => (
-            <TextInput
-              key={index}
-              style={styles.input}
-              placeholder={field
-                .replace("_", " ")
-                .replace(/\b\w/g, (c) => c.toUpperCase())}
-              value={updatedUser[field] || ""}
-              editable={isEditable}
-              onChangeText={(value) => handleInputChange(field, value)}
-            />
-          )
-        )}
-
-        {/* Address Fields */}
-        {["pb_number", "street_name", "city", "district"].map(
-          (field, index) => (
-            <TextInput
-              key={index}
-              style={styles.input}
-              placeholder={field
-                .replace("_", " ")
-                .replace(/\b\w/g, (c) => c.toUpperCase())}
-              value={addressup[field]}
-              editable={isEditable}
-              onChangeText={(value) => handleAddressChange(field, value)}
-            />
-          )
-        )}
-
-        {/* Buttons */}
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleEdit}>
-            <Text style={styles.buttonText}>Edit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleSaveClick}>
-            <Text style={styles.buttonText}>Save</Text>
-          </TouchableOpacity>
+      {user ? (
+        <View style={styles.container}>
+          <Text style={styles.greeting}>Hi! {user.first_name || "User"}</Text>
+          <Image source={logo} style={styles.avatar} />
+          {["first_name", "last_name", "email", "mobile_number"].map(
+            (field, index) => (
+              <TextInput
+                key={index}
+                style={styles.input}
+                placeholder={field
+                  .replace("_", " ")
+                  .replace(/\b\w/g, (c) => c.toUpperCase())}
+                value={updatedUser[field] || ""}
+                editable={isEditable}
+                onChangeText={(value) => handleInputChange(field, value)}
+              />
+            )
+          )}
+          {["pb_number", "street_name", "city", "district"].map(
+            (field, index) => (
+              <TextInput
+                key={index}
+                style={styles.input}
+                placeholder={field
+                  .replace("_", " ")
+                  .replace(/\b\w/g, (c) => c.toUpperCase())}
+                value={addressup[field]}
+                editable={isEditable}
+                onChangeText={(value) => handleAddressChange(field, value)}
+              />
+            )
+          )}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.button} onPress={handleEdit}>
+              <Text style={styles.buttonText}>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSaveClick}>
+              <Text style={styles.buttonText}>Save</Text>
+            </TouchableOpacity>
+          </View>
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
-
-        {error && <Text style={styles.errorText}>{error}</Text>}
-      </View>
+      ) : (
+        <>
+          <Text style={styles.nousertext}>User Not signed in</Text>
+          <TouchableOpacity
+            style={styles.touchableopacity}
+            onPress={() => navigation.navigate("Sign_In")}
+          >
+            <Text style={styles.buttonText2}>Sign In</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </ScrollView>
   );
 };
@@ -273,6 +252,22 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginTop: 10,
+  },
+  nousertext: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  touchableopacity: {
+    backgroundColor: colors.darkGreen,
+    padding: 10,
+    borderRadius: 100,
+    marginTop: 20,
+    width: 200,
+  },
+  buttonText2: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
   },
 });
 

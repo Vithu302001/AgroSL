@@ -7,9 +7,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
+  Image,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import colors from "../../constants/colors";
+import logo from "../../assets/images/AgroSL.png";
 
 const Tracking = () => {
   const route = useRoute();
@@ -21,6 +23,7 @@ const Tracking = () => {
   const [orderData, setOrderData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [deliveryRiderDetails, setDeliveryRiderDetails] = useState(null);
 
   const handleConfirmDelivery = () => {
     const formatDate = () => {
@@ -55,6 +58,7 @@ const Tracking = () => {
       });
   };
 
+  // Fetch delivery data using orderID
   useEffect(() => {
     axios
       .get(
@@ -62,18 +66,35 @@ const Tracking = () => {
       )
       .then((res) => {
         setOrderData(res.data);
-        setLoading(false);
       })
       .catch((err) => {
         setError(err.message);
-        setLoading(false);
       });
   }, [orderID]);
+
+  // Fetch delivery rider details after orderData is fetched
+  useEffect(() => {
+    if (orderData && orderData.delivery_rider_id) {
+      axios
+        .get(
+          `http://backend-rho-three-58.vercel.app/users/${orderData.delivery_rider_id}`
+        )
+        .then((res) => {
+          setDeliveryRiderDetails(res.data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message);
+          setLoading(false);
+        });
+    }
+  }, [orderData]);
 
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color={colors.darkGreen} />
+        <Text>Loading delivery data...</Text>
       </View>
     );
   }
@@ -109,65 +130,86 @@ const Tracking = () => {
     {
       title: "Sent to delivery rider",
       description: orderData.delivered_to_sc
-        ? `Delivered to delivery rider (${orderData.delivery_rider_id}) on ${orderData.delivered_to_sc}`
+        ? `Delivered to delivery rider : ${
+            deliveryRiderDetails?.first_name +
+            " " +
+            deliveryRiderDetails?.last_name
+          }\nContact Number : ${deliveryRiderDetails?.mobile_number} \non ${
+            orderData?.delivered_to_sc
+          }`
         : "Not yet delivered to delivery rider",
       isCompleted: orderData.delivered_to_sc !== null,
     },
     {
       title: "Delivered to Buyer",
       description: isDeliveryConfirmed
-        ? `Delivered to buyer on ${orderData.confirmation_date}`
+        ? `Delivered to buyer on ${orderData.delivered_to_sc}`
         : "Not yet delivered to buyer",
       isCompleted: isDeliveryConfirmed,
     },
   ];
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>Delivery Progress</Text>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      style={styles.container2}
+    >
+      <Image source={logo} style={{ width: 100, height: 100 }} />
+      <View style={styles.container2}>
+        <Text style={styles.header}>Delivery Progress</Text>
 
-      <Text style={styles.infoText}>
-        Order ID: <Text style={styles.bold}>{orderData.order_id}</Text>
-      </Text>
-      <Text style={styles.infoText}>
-        Delivery ID: <Text style={styles.bold}>{orderData.delivery_id}</Text>
-      </Text>
-
-      {steps.map((step, index) => (
-        <View key={index} style={styles.stepContainer}>
-          <Text
-            style={[
-              styles.stepTitle,
-              step.isCompleted && styles.bold && styles.currentStep,
-            ]}
-          >
-            {step.title}
-          </Text>
-          <Text style={styles.stepDescription}>{step.description}</Text>
-        </View>
-      ))}
-
-      <TouchableOpacity
-        style={[
-          styles.confirmButton,
-          isDeliveryConfirmed && styles.disabledButton,
-        ]}
-        onPress={handleConfirmDelivery}
-        disabled={isDeliveryConfirmed}
-      >
-        <Text style={styles.confirmButtonText}>
-          {isDeliveryConfirmed ? "Delivery Confirmed" : "Confirm Delivery"}
+        <Text style={styles.infoText}>
+          Order ID: <Text style={styles.bold}>{orderData.order_id}</Text>
         </Text>
-      </TouchableOpacity>
+        <Text style={styles.infoText}>
+          Delivery ID: <Text style={styles.bold}>{orderData.delivery_id}</Text>
+        </Text>
+
+        {steps.map((step, index) => (
+          <View key={index} style={styles.stepContainer}>
+            <Text
+              style={[
+                styles.stepTitle,
+                step.isCompleted ? styles.currentStep : null,
+              ]}
+            >
+              {step.title}
+            </Text>
+            <Text style={styles.stepDescription}>{step.description}</Text>
+          </View>
+        ))}
+
+        <TouchableOpacity
+          style={[
+            styles.confirmButton,
+            isDeliveryConfirmed && styles.disabledButton,
+          ]}
+          onPress={handleConfirmDelivery}
+          disabled={isDeliveryConfirmed}
+        >
+          <Text style={styles.confirmButtonText}>
+            {isDeliveryConfirmed ? "Delivery Confirmed" : "Confirm Delivery"}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 10,
     padding: 20,
     backgroundColor: "#fff",
     alignItems: "center",
+    borderStartColor: "green",
+    borderStartWidth: 5,
+  },
+  container2: {
+    width: "100%",
+    padding: 20,
+    backgroundColor: "#fff",
+    display: "flex",
   },
   loadingContainer: {
     flex: 1,
@@ -220,6 +262,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
   },
+  currentStep: {
+    color: colors.darkGreen,
+    fontSize: 22,
+    fontWeight: "bold",
+  },
   confirmButton: {
     backgroundColor: "#4CAF50",
     padding: 15,
@@ -233,10 +280,6 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: "#fff",
     fontWeight: "bold",
-  },
-  currentStep: {
-    color: colors.darkGreen,
-    fontSize: 25,
   },
 });
 

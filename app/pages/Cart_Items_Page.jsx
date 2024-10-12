@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, Text, Button, StyleSheet, Alert } from "react-native";
 import colors from "../../constants/colors";
 import Cart_Item_View from "../../components/Cart_Items";
 import { useNavigation } from "@react-navigation/native";
@@ -32,12 +32,20 @@ const Cart_Items_Page = () => {
         </Text>
         <Button
           title="Checkout"
-          onPress={() =>
-            navigation.navigate("CheckOut", {
-              totalPrice: totalPrice,
-              // You can also pass other data here, like cart items if needed
-            })
-          }
+          onPress={() => {
+            if (itemCount > 0) {
+              navigation.navigate("CheckOut", {
+                totalPrice: totalPrice,
+                // You can also pass other data here, like cart items if needed
+              });
+            } else {
+              Alert.alert(
+                "Cart is Empty",
+                "Please add items to cart to proceed to checkout"
+              );
+              navigation.navigate("Home");
+            }
+          }}
           color={colors.seaGreen}
         />
       </View>

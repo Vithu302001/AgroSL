@@ -89,6 +89,15 @@ const BuyerOrders = () => {
     }
   }, [buyerId]);
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={colors.darkGreen} />
+        <Text>Loading delivery data...</Text>
+      </View>
+    );
+  }
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString(); // Format date as MM/DD/YYYY
@@ -110,14 +119,6 @@ const BuyerOrders = () => {
   };
 
   const renderOrderItem = ({ item }) => {
-    if (loading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.darkGreen} />
-        </View>
-      );
-    }
-
     return (
       <View style={styles.card}>
         {item.item_image && (
@@ -236,6 +237,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#777",
     fontSize: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

@@ -29,8 +29,8 @@ function Sign_In() {
       const currentUser = auth.currentUser;
       navigation.navigate("HomeTabs");
     } catch (error) {
-      console.error("Error signing in:", error);
-      alert(error.message); // Provide more specific error feedback
+      console.log("Error signing in:", error);
+      alert("Username and Password Mismatched try again");
     }
   };
 
