@@ -15,7 +15,8 @@
         "MESSAGING_SENDER_ID": "321966335054",
         "APP_ID": "1:321966335054:web:33f8ab854a66403434cf1f",
         "MEASUREMENT_ID": "G-SZKME5P15M"
-      }
+      },
+      "channel": "development"
     },
     "preview": {
       "ios": {
@@ -32,7 +33,8 @@
         "MESSAGING_SENDER_ID": "321966335054",
         "APP_ID": "1:321966335054:web:33f8ab854a66403434cf1f",
         "MEASUREMENT_ID": "G-SZKME5P15M"
-      }
+      },
+      "channel": "preview"
     },
     "production": {
       "env": {
@@ -43,7 +45,8 @@
         "MESSAGING_SENDER_ID": "321966335054",
         "APP_ID": "1:321966335054:web:33f8ab854a66403434cf1f",
         "MEASUREMENT_ID": "G-SZKME5P15M"
-      }
+      },
+      "channel": "production"
     }
   },
   "submit": {

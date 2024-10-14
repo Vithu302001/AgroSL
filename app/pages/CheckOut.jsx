@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -9,34 +9,39 @@ import {
   StyleSheet,
 } from "react-native";
 import { WebView } from "react-native-webview";
+import * as Notifications from "expo-notifications";
 import colors from "../../constants/colors";
-import { auth } from "../../Backend/firebase"; // Ensure this is your Firebase auth setup
-import image from "../../assets/images/Credit_Card_Payment.png";
+import { auth } from "../../Backend/firebase";
+import image from "../../assets/images/creditCardImage.jpg";
+import { registerForPushNotifications } from "../../Backend/notification"; // Custom helper to register token
 
 const CheckoutPage = ({ navigation }) => {
   const [user_id, setUser_id] = useState(null);
-  const [loading, setLoading] = useState(false); // State to manage loading spinner
-  const [showWebView, setShowWebView] = useState(false); // State to control WebView visibility
-  const [paymentUrl, setPaymentUrl] = useState(""); // State to hold the payment URL
+  const [loading, setLoading] = useState(false);
+  const [showWebView, setShowWebView] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState("");
+  const expoPushToken = useRef(null); // Store push token
 
-  // Fetch current user on component mount using onAuthStateChanged
+  // Register for notifications and fetch current user on component mount
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((currentUser) => {
       setUser_id(currentUser?.uid);
     });
 
-    // Cleanup subscription on unmount
+    // Register for push notifications and save the token
+    registerForPushNotifications().then((token) => {
+      expoPushToken.current = token;
+    });
+
     return () => unsubscribe();
   }, []);
 
-  // Handle checkout button press
   const handleCheckout = () => {
     if (user_id) {
-      // Construct the payment URL with user info
       const paymentUrl = `https://agro-sl.vercel.app/mobile_checkout/${user_id}`;
-      setPaymentUrl(paymentUrl); // Set the payment URL
-      setShowWebView(true); // Show the WebView
-      setLoading(true); // Show loading spinner
+      setPaymentUrl(paymentUrl);
+      setShowWebView(true);
+      setLoading(true);
     } else {
       Alert.alert("Error", "User not found. Please log in.");
     }
@@ -46,14 +51,27 @@ const CheckoutPage = ({ navigation }) => {
     const successUrl = "https://agro-sl.vercel.app/Success";
     const errorUrl = "https://agro-sl.vercel.app/error";
 
-    // Check if the URL is the success or error URL
     if (navState.url.includes(successUrl)) {
-      setShowWebView(false); // Hide the WebView
+      setShowWebView(false);
+      sendSuccessNotification(); // Send notification on success
       navigation.navigate("Home");
     } else if (navState.url.includes(errorUrl)) {
       Alert.alert("Error", "Payment failed. Please try again.");
-      setShowWebView(false); // Hide the WebView
+      setShowWebView(false);
       navigation.navigate("Home");
+    }
+  };
+
+  // Function to send push notification
+  const sendSuccessNotification = async () => {
+    if (expoPushToken.current) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Payment Successful 🎉",
+          body: "Thank you for your purchase! Your order is being processed.",
+        },
+        trigger: null, // Send immediately
+      });
     }
   };
 
@@ -70,7 +88,7 @@ const CheckoutPage = ({ navigation }) => {
           source={{ uri: paymentUrl }}
           onNavigationStateChange={handleNavigationStateChange}
           style={styles.webView}
-          onLoadEnd={() => setLoading(false)} // Hide loading when page loads
+          onLoadEnd={() => setLoading(false)}
         />
       )}
 

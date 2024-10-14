@@ -46,13 +46,13 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
           setLoading(true);
           try {
             const response = await axios.get(
-              `http://backend-rho-three-58.vercel.app/cartWithSellerName/${currentUser.uid}`
+              `https://backend-rho-three-58.vercel.app/cartWithSellerName/${currentUser.uid}`
             );
             setCartItems(response.data); // Update the cart items from the backend
             updateTotalPrice(
               calculateTotalPrice(response.data),
               response.data.length
-            ); // Update the total price based on the updated cart items
+            );
           } catch (err) {
             setError(err.message);
             setCartItems([]); // Handle empty or error state
@@ -78,7 +78,7 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
   const handleDelete = async (rowKey, itemId) => {
     try {
       await axios.delete(
-        `http://backend-rho-three-58.vercel.app/cart/${currentUser.uid}/${itemId}`
+        `https://backend-rho-three-58.vercel.app/cart/${currentUser.uid}/${itemId}`
       );
       const newCartItems = cartItems.filter(
         (_, index) => index !== parseInt(rowKey, 10)
@@ -116,7 +116,7 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
           setQuantity={(value) => handleQuantityChange(index, value)}
         />
         <Text style={styles.itemPrice}>
-          ${(item.quantity * parseFloat(item.price)).toFixed(2)}
+          LKR:{(item.quantity * parseFloat(item.price)).toFixed(2)}
         </Text>
       </View>
     </Pressable>

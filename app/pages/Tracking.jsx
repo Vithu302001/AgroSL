@@ -39,7 +39,7 @@ const Tracking = () => {
     const confirmationDate = formatDate();
     axios
       .patch(
-        `http://backend-rho-three-58.vercel.app/delivery/${orderData.delivery_id}`,
+        `https://backend-rho-three-58.vercel.app/delivery/${orderData.delivery_id}`,
         {
           is_delivered_to_buyer: true,
           confirmation_date: confirmationDate,
@@ -62,7 +62,7 @@ const Tracking = () => {
   useEffect(() => {
     axios
       .get(
-        `http://backend-rho-three-58.vercel.app/delivery-by-orderID/${orderID}`
+        `https://backend-rho-three-58.vercel.app/delivery-by-orderID/${orderID}`
       )
       .then((res) => {
         setOrderData(res.data);
@@ -77,7 +77,7 @@ const Tracking = () => {
     if (orderData && orderData.delivery_rider_id) {
       axios
         .get(
-          `http://backend-rho-three-58.vercel.app/users/${orderData.delivery_rider_id}`
+          `https://backend-rho-three-58.vercel.app/users/${orderData.delivery_rider_id}`
         )
         .then((res) => {
           setDeliveryRiderDetails(res.data);

@@ -32,7 +32,9 @@
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-vector-icons": "^10.2.0",
     "react-native-webview": "13.8.6",
-    "stripe": "^17.2.0"
+    "stripe": "^17.2.0",
+    "expo-notifications": "~0.28.18",
+    "expo-device": "~6.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

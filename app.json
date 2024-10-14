@@ -20,7 +20,13 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.vithu30.AgroSL",
-      "permissions": ["INTERNET"]
+      "permissions": [
+        "INTERNET",
+        "ACCESS_NETWORK_STATE",
+        "ACCESS_WIFI_STATE",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/images/AgroSL.png"

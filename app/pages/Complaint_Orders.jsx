@@ -43,7 +43,7 @@ const ComplaintPage = () => {
 
     try {
       const response = await axios.post(
-        "http://backend-rho-three-58.vercel.app/api/complaints",
+        "https://backend-rho-three-58.vercel.app/api/complaints",
         {
           buyer_id: buyerId,
           description,
