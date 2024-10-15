@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -47,6 +47,10 @@ const Home = () => {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+  const updateItemCount = (count) => {
+    setCartItemsCount(count);
+  };
 
   // Firebase sign-out function
   const handleLogout = async () => {

@@ -73,7 +73,6 @@ const BuyerOrders = () => {
           })
         );
 
-        // Sort by order_id
         ordersWithImages.sort((a, b) => b.order_id.localeCompare(a.order_id));
 
         setOrders(ordersWithImages);

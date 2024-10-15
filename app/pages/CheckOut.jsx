@@ -13,14 +13,17 @@ import * as Notifications from "expo-notifications";
 import colors from "../../constants/colors";
 import { auth } from "../../Backend/firebase";
 import image from "../../assets/images/creditCardImage.jpg";
-import { registerForPushNotifications } from "../../Backend/notification"; // Custom helper to register token
+import { registerForPushNotifications } from "../../Backend/notification";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
-const CheckoutPage = ({ navigation }) => {
+const CheckoutPage = () => {
   const [user_id, setUser_id] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showWebView, setShowWebView] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
-  const expoPushToken = useRef(null); // Store push token
+  const expoPushToken = useRef(null);
+  const route = useRoute();
+  const navigation = useNavigation();
 
   // Register for notifications and fetch current user on component mount
   useEffect(() => {
@@ -28,7 +31,6 @@ const CheckoutPage = ({ navigation }) => {
       setUser_id(currentUser?.uid);
     });
 
-    // Register for push notifications and save the token
     registerForPushNotifications().then((token) => {
       expoPushToken.current = token;
     });
@@ -52,8 +54,10 @@ const CheckoutPage = ({ navigation }) => {
     const errorUrl = "https://agro-sl.vercel.app/error";
 
     if (navState.url.includes(successUrl)) {
+      sendSuccessNotification();
       setShowWebView(false);
-      sendSuccessNotification(); // Send notification on success
+      route.params?.onPaymentSuccess(); // Ensure callback is called
+      sendSuccessNotification();
       navigation.navigate("Home");
     } else if (navState.url.includes(errorUrl)) {
       Alert.alert("Error", "Payment failed. Please try again.");
@@ -62,7 +66,6 @@ const CheckoutPage = ({ navigation }) => {
     }
   };
 
-  // Function to send push notification
   const sendSuccessNotification = async () => {
     if (expoPushToken.current) {
       await Notifications.scheduleNotificationAsync({

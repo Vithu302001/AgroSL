@@ -21,59 +21,54 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isPressed, setIsPressed] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null); // Track the current user
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Listen for authentication state changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
       if (!user) {
-        // Clear cart items when user logs out
-        console.log("No user ");
+        console.log("No user");
         setCartItems([]);
-        updateTotalPrice(0, 0);
+        updateTotalPrice(0, 0); // Clear total price on logout
       }
     });
-
-    return () => unsubscribe(); // Clean up the listener on unmount
+    return () => unsubscribe();
   }, []);
 
   useFocusEffect(
     useCallback(() => {
-      // Fetch the cart items only when the user is available and screen is focused
-      if (currentUser) {
-        const fetchCartItems = async () => {
-          setLoading(true);
-          try {
-            const response = await axios.get(
-              `https://backend-rho-three-58.vercel.app/cartWithSellerName/${currentUser.uid}`
-            );
-            setCartItems(response.data); // Update the cart items from the backend
-            updateTotalPrice(
-              calculateTotalPrice(response.data),
-              response.data.length
-            );
-          } catch (err) {
-            setError(err.message);
-            setCartItems([]); // Handle empty or error state
-          } finally {
-            setLoading(false);
-          }
-        };
-
-        fetchCartItems();
-      } else {
-        setLoading(false); // Handle case where user is not logged in
-      }
-    }, [currentUser]) // This effect will re-run when the currentUser changes or screen is focused
+      const fetchCartItems = async () => {
+        if (!currentUser) {
+          setLoading(false);
+          return;
+        }
+        setLoading(true);
+        try {
+          const response = await axios.get(
+            `https://backend-rho-three-58.vercel.app/cartWithSellerName/${currentUser.uid}`
+          );
+          const items = response.data;
+          setCartItems(items);
+          const totalPrice = calculateTotalPrice(items);
+          updateTotalPrice(totalPrice, items.length);
+        } catch (err) {
+          setError(err.message);
+          setCartItems([]);
+          updateTotalPrice(0, 0); // Reset total price on error
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchCartItems();
+    }, [currentUser])
   );
 
-  const calculateTotalPrice = (items) => {
-    return items.reduce(
+  const calculateTotalPrice = (items) =>
+    items.reduce(
       (total, item) => total + parseFloat(item.price) * item.quantity,
       0
     );
-  };
 
   const handleDelete = async (rowKey, itemId) => {
     try {
@@ -84,21 +79,34 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
         (_, index) => index !== parseInt(rowKey, 10)
       );
       setCartItems(newCartItems);
-      updateTotalPrice(calculateTotalPrice(newCartItems), newCartItems.length); // Update the total price after removal
+      updateTotalPrice(calculateTotalPrice(newCartItems), newCartItems.length);
     } catch (err) {
       console.error("Error removing item:", err);
       Alert.alert("Error", "Failed to remove item from cart.");
     }
   };
 
-  const handleQuantityChange = (index, newQuantity) => {
+  const handleQuantityChange = async (index, newQuantity) => {
     const updatedCartItems = [...cartItems];
     updatedCartItems[index].quantity = newQuantity;
     setCartItems(updatedCartItems);
     updateTotalPrice(
       calculateTotalPrice(updatedCartItems),
       updatedCartItems.length
-    ); // Update the total price on quantity change
+    );
+
+    try {
+      const itemId = updatedCartItems[index].item_id;
+      console.log(itemId);
+      await axios.put(
+        `https://backend-rho-three-58.vercel.app/cart/${currentUser.uid}/${itemId}`,
+        { quantity: newQuantity }
+      );
+      console.log("Quantity updated successfully!");
+    } catch (err) {
+      console.error("Failed to update quantity:", err);
+      Alert.alert("Error", "Failed to update item quantity.");
+    }
   };
 
   const renderItems = ({ item, index }) => (
@@ -116,35 +124,30 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
           setQuantity={(value) => handleQuantityChange(index, value)}
         />
         <Text style={styles.itemPrice}>
-          LKR:{(item.quantity * parseFloat(item.price)).toFixed(2)}
+          LKR: {(item.quantity * parseFloat(item.price)).toFixed(2)}
         </Text>
       </View>
     </Pressable>
   );
 
-  const renderHiddenItem = (data, rowMap) => {
-    const { index, item } = data;
-    return (
-      <View style={styles.hiddenItemContainer}>
-        <Pressable
-          onPressIn={() => setIsPressed(true)} // Set pressed state to true on press in
-          onPressOut={() => setIsPressed(false)} // Set pressed state to false on press out
-          onPress={() => {
-            handleDelete(index.toString(), item.item_id);
-            if (rowMap[index] !== undefined) {
-              rowMap[index]?.closeRow();
-            }
-          }}
-          style={({ pressed }) => [
-            styles.button,
-            { backgroundColor: pressed ? "red" : colors.lightGreen }, // Change background color on press
-          ]}
-        >
-          <FontAwesome name="trash" size={24} color="white" />
-        </Pressable>
-      </View>
-    );
-  };
+  const renderHiddenItem = (data, rowMap) => (
+    <View style={styles.hiddenItemContainer}>
+      <Pressable
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
+        onPress={() => {
+          handleDelete(data.index.toString(), data.item.item_id);
+          rowMap[data.index]?.closeRow();
+        }}
+        style={({ pressed }) => [
+          styles.button,
+          { backgroundColor: pressed ? "red" : colors.lightGreen },
+        ]}
+      >
+        <FontAwesome name="trash" size={24} color="white" />
+      </Pressable>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -155,82 +158,52 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
         </View>
       ) : cartItems.length > 0 ? (
         <SwipeListView
-          rightOpenValue={-50}
-          previewRowKey={"0"}
-          previewOpenValue={-40}
-          previewOpenDelay={3000}
           data={cartItems}
           renderItem={renderItems}
           renderHiddenItem={renderHiddenItem}
-          showsVerticalScrollIndicator={false}
+          rightOpenValue={-50}
           keyExtractor={(item, index) => index.toString()}
         />
       ) : (
-        <EmptyCart />
+        <>
+          {updateTotalPrice(0, 0)}
+          <EmptyCart />
+        </>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginHorizontal: 6,
-    marginVertical: 4,
-  },
+  container: { marginHorizontal: 6, marginVertical: 4 },
   itemContainer: {
     width: "98%",
-    borderRadius: 10,
-    marginHorizontal: "auto",
     marginBottom: 10,
     backgroundColor: "white",
+    marginHorizontal: "auto",
+    borderRadius: 10,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
-    shadowRadius: 1.41,
     elevation: 2,
     height: 100,
   },
-  itemContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 10,
-  },
-  itemDetails: {
-    flex: 1,
-  },
-  itemName: {
-    fontWeight: "bold",
-  },
-  itemSeller: {
-    color: "gray",
-  },
-  itemQuantity: {
-    color: "gray",
-  },
-  itemPrice: {
-    fontWeight: "bold",
-  },
+  itemContent: { flexDirection: "row", alignItems: "center", padding: 10 },
+  itemDetails: { flex: 1 },
+  itemName: { fontWeight: "bold" },
+  itemSeller: { color: "gray" },
+  itemPrice: { fontWeight: "bold" },
   hiddenItemContainer: {
     flex: 1,
     alignItems: "flex-end",
-    backgroundColor: colors.lightGreen,
-    borderRadius: 10,
     justifyContent: "center",
-    paddingRight: 10,
+    borderRadius: 10,
     marginBottom: 10,
+    paddingRight: 10,
+    backgroundColor: colors.lightGreen,
   },
-  button: {
-    borderRadius: 10,
-    padding: 10,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  button: { borderRadius: 10, padding: 10 },
+  loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
 });
 
 export default Cart_Item_View;

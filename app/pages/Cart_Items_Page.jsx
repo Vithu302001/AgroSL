@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, Alert } from "react-native";
 import colors from "../../constants/colors";
 import Cart_Item_View from "../../components/Cart_Items";
-import { useNavigation } from "@react-navigation/native";
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { auth } from "../../Backend/firebase";
 
 const Cart_Items_Page = () => {
@@ -10,15 +14,22 @@ const Cart_Items_Page = () => {
   const [itemCount, setItemCount] = useState(0);
   const navigation = useNavigation();
   const currentUser = auth.currentUser;
+  const route = useRoute();
 
   const updateTotalPrice = (newTotal, count) => {
     setTotalPrice(newTotal);
     setItemCount(count);
   };
 
-  useEffect(() => {
-    console.log("Cart Items Page");
-  }, [currentUser]);
+  useFocusEffect(
+    useCallback(() => {
+      if (currentUser) {
+        console.log(currentUser.uid);
+      } else {
+        updateTotalPrice(0, 0);
+      }
+    }, [currentUser])
+  );
 
   return (
     <View style={styles.container}>
@@ -35,8 +46,8 @@ const Cart_Items_Page = () => {
           onPress={() => {
             if (itemCount > 0) {
               navigation.navigate("CheckOut", {
-                totalPrice: totalPrice,
-                // You can also pass other data here, like cart items if needed
+                totalPrice,
+                onPaymentSuccess: () => updateTotalPrice(0, 0),
               });
             } else {
               Alert.alert(
