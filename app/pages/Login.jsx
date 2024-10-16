@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import colors from "../../constants/colors";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -16,21 +17,88 @@ import { auth } from "../../Backend/firebase";
 import { useNavigation } from "@react-navigation/native";
 import { MaterialIcons } from "@expo/vector-icons";
 import logo from "../../assets/images/AgroSL.png";
+import axios from "axios";
+import * as Notifications from "expo-notifications";
+import { registerForPushNotifications } from "../../Backend/notification";
 
 function Sign_In() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
+  const expoPushToken = useRef(null);
 
   const handleSignIn = async () => {
     try {
+      registerForPushNotifications().then((token) => {
+        expoPushToken.current = token;
+      });
+
+      // Firebase Authentication
       await signInWithEmailAndPassword(auth, email, password);
+      sendSuccessNotification(email);
+
       console.log("User signed in:", email);
       const currentUser = auth.currentUser;
-      navigation.navigate("HomeTabs");
+
+      // Fetch user type from backend
+      handleUserRedirection(currentUser);
     } catch (error) {
       console.log("Error signing in:", error);
-      alert("Username and Password Mismatched try again");
+      Alert.alert("Error", "Username and Password Mismatched. Try again.");
+    }
+  };
+
+  const handleUserRedirection = async (currentUser) => {
+    try {
+      const response = await axios.get(
+        `https://backend-rho-three-58.vercel.app/get_user/${currentUser.uid}`
+      );
+
+      const userType = response.data.user_type;
+      console.log("User type:", userType);
+
+      if (userType === "buyer") {
+        navigation.navigate("HomeTabs", { userId: currentUser.uid });
+      } else if (userType === "delivery_rider") {
+        navigation.navigate("DeliveryRiderDashboard", {
+          userId: currentUser.uid,
+        });
+      } else {
+        Alert.alert("Error", "User type not recognized.");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        try {
+          // Check if the user is an admin
+          const admin = await axios.get(
+            `https://backend-rho-three-58.vercel.app/admin/${currentUser.uid}`
+          );
+
+          if (admin.data && admin.data.user_id) {
+            navigation.navigate("AdminDashboard");
+          } else {
+            Alert.alert("Error", "User type not recognized.");
+          }
+        } catch (adminError) {
+          console.error("Error checking admin table:", adminError);
+          Alert.alert("Error", "Something went wrong. Please try again.");
+        }
+      } else {
+        console.error("Error fetching user data:", error);
+        Alert.alert("Error", "Something went wrong. Please try again.");
+      }
+    }
+  };
+
+  const sendSuccessNotification = async (email) => {
+    if (expoPushToken.current) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Logged in successfully",
+          body: `${email} has successfully logged in.`,
+        },
+        trigger: null, // Send immediately
+      });
     }
   };
 
@@ -43,12 +111,7 @@ function Sign_In() {
         <Image source={logo} style={styles.logo} />
         <Text style={styles.heading}>Sign In</Text>
         <View style={styles.inputContainer}>
-          <MaterialIcons
-            name="email"
-            size={24}
-            color="black"
-            style={styles.icon}
-          />
+          <MaterialIcons name="email" size={24} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Email Address"
@@ -57,18 +120,13 @@ function Sign_In() {
           />
         </View>
         <View style={styles.inputContainer}>
-          <MaterialIcons
-            name="lock"
-            size={24}
-            color="black"
-            style={styles.icon}
-          />
+          <MaterialIcons name="lock" size={24} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry={true} // Mask password input
+            secureTextEntry={true}
           />
         </View>
         <TouchableOpacity style={styles.button} onPress={handleSignIn}>
@@ -116,15 +174,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.gray,
     marginBottom: 20,
-    width: "100%",
+  },
+  icon: {
+    marginRight: 10,
   },
   input: {
     flex: 1,
     height: 40,
-    paddingLeft: 10,
-  },
-  icon: {
-    marginRight: 10,
   },
   button: {
     marginTop: 20,
@@ -137,17 +193,15 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
     fontWeight: "bold",
-    alignSelf: "center",
+    textAlign: "center",
   },
   footer: {
     flexDirection: "row",
-    justifyContent: "center",
     marginTop: 10,
   },
   link: {
-    color: colors.darkGreen,
+    color: colors.primary,
     fontWeight: "bold",
   },
 });

@@ -16,7 +16,7 @@ const Item = ({ item, onPress, buyer_id, increaseCartCount }) => {
         const price = item.unit_price;
 
         const response = await axios.post(
-          `http://backend-rho-three-58.vercel.app/cart`,
+          `https://backend-rho-three-58.vercel.app/cart`,
           {
             buyer_id: buyer_id,
             item_id: item_id,
@@ -35,6 +35,7 @@ const Item = ({ item, onPress, buyer_id, increaseCartCount }) => {
         }
       }
     } else {
+      alert("Please log in to add items to the cart");
       navigation.navigate("Sign_In");
     }
   };

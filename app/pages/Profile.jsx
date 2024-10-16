@@ -17,7 +17,7 @@ import { auth } from "../../Backend/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 
-const BASE_URL = "http://backend-rho-three-58.vercel.app";
+const BASE_URL = "https://backend-rho-three-58.vercel.app";
 
 const Profile = () => {
   const [isEditable, setIsEditable] = useState(false);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -48,6 +48,10 @@ const Home = () => {
     return () => unsubscribe();
   }, []);
 
+  const updateItemCount = (count) => {
+    setCartItemsCount(count);
+  };
+
   // Firebase sign-out function
   const handleLogout = async () => {
     Alert.alert("Log Out", "Are you sure you want to log out?", [
@@ -71,7 +75,7 @@ const Home = () => {
       setLoading(true); // Set loading to true while fetching
       try {
         const response = await axios.get(
-          "http://backend-rho-three-58.vercel.app/items"
+          "https://backend-rho-three-58.vercel.app/items"
         );
         console.log(response.data);
         setItems(response.data);
@@ -90,7 +94,7 @@ const Home = () => {
     const fetchCartItems = async () => {
       try {
         const response1 = await axios.get(
-          `http://backend-rho-three-58.vercel.app/cart/${
+          `https://backend-rho-three-58.vercel.app/cart/${
             userID ? userID : null
           }`
         );
@@ -168,7 +172,11 @@ const Home = () => {
         <TouchableOpacity
           onPress={() => {
             if (userID) {
-              navigation.navigate("Cart");
+              navigation.navigate("Cart", {
+                updateItemCount: (itemCount) => {
+                  setCartItemsCount(itemCount);
+                },
+              });
             } else {
               navigation.navigate("Sign_In");
             }
