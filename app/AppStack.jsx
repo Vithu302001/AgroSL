@@ -15,6 +15,9 @@ import ComplaintPage from "./pages/Complaint_Orders";
 import Tracking from "./pages/Tracking";
 import CheckoutPage from "./pages/CheckOut";
 import colors from "../constants/colors";
+import DeliveryRiderDashboard from "./pages/DeliveryRiderDashboard";
+import Deliveries from "./pages/Deliveries";
+import Rider_Orders from "./pages/RiderOrders";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -63,6 +66,11 @@ const AppStack = () => {
       <Stack.Screen name="Complaint" component={ComplaintPage} />
       <Stack.Screen name="Tracking" component={Tracking} />
       <Stack.Screen name="CheckOut" component={CheckoutPage} />
+      <Stack.Screen
+        name="DeliveryRiderDashboard"
+        component={DeliveryRiderDashboard}
+      />
+      <Stack.Screen name="Deliveries" component={Deliveries} />
     </Stack.Navigator>
   );
 };

@@ -35,6 +35,7 @@ const Item = ({ item, onPress, buyer_id, increaseCartCount }) => {
         }
       }
     } else {
+      alert("Please log in to add items to the cart");
       navigation.navigate("Sign_In");
     }
   };

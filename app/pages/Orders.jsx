@@ -25,7 +25,6 @@ const BuyerOrders = () => {
     // Monitor auth state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        // User is signed in, set buyer ID
         setBuyerId(user.uid);
       } else {
         // User is signed out
@@ -88,12 +87,25 @@ const BuyerOrders = () => {
     }
   }, [buyerId]);
 
-  if (loading) {
+  if (loading && buyerId) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.darkGreen} />
         <Text>Loading delivery data...</Text>
       </View>
+    );
+  }
+  if (!buyerId) {
+    return (
+      <>
+        <Text style={styles.nousertext}>User Not signed in</Text>
+        <TouchableOpacity
+          style={styles.touchableopacity}
+          onPress={() => navigation.navigate("Sign_In")}
+        >
+          <Text style={styles.buttonText2}>Sign In</Text>
+        </TouchableOpacity>
+      </>
     );
   }
 
@@ -241,6 +253,29 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  nousertext: {
+    position: "absolute",
+    top: "45%",
+    left: "30%",
+    justifySelf: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  touchableopacity: {
+    position: "absolute",
+    top: "45%",
+    left: "27%",
+    backgroundColor: colors.darkGreen,
+    padding: 10,
+    borderRadius: 100,
+    marginTop: 50,
+    width: 200,
+  },
+  buttonText2: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
   },
 });
 

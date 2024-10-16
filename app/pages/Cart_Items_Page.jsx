@@ -39,6 +39,7 @@ const Cart_Items_Page = () => {
       </View>
       <View style={styles.footer}>
         <Text style={styles.totalText}>
+          {route.params?.updateItemCount(itemCount)}
           Items:{itemCount} | Total: LKR {totalPrice}.00
         </Text>
         <Button

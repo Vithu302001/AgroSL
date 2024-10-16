@@ -56,8 +56,7 @@ const CheckoutPage = () => {
     if (navState.url.includes(successUrl)) {
       sendSuccessNotification();
       setShowWebView(false);
-      route.params?.onPaymentSuccess(); // Ensure callback is called
-      sendSuccessNotification();
+      route.params?.onPaymentSuccess();
       navigation.navigate("Home");
     } else if (navState.url.includes(errorUrl)) {
       Alert.alert("Error", "Payment failed. Please try again.");

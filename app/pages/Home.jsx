@@ -172,7 +172,11 @@ const Home = () => {
         <TouchableOpacity
           onPress={() => {
             if (userID) {
-              navigation.navigate("Cart");
+              navigation.navigate("Cart", {
+                updateItemCount: (itemCount) => {
+                  setCartItemsCount(itemCount);
+                },
+              });
             } else {
               navigation.navigate("Sign_In");
             }
