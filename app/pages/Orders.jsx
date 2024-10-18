@@ -43,7 +43,7 @@ const BuyerOrders = () => {
       console.log("Fetching orders for buyer_id: ", buyerId);
       try {
         const response = await axios.get(
-          `https://backend-rho-three-58.vercel.app/api/orders_for_buyers/${buyerId}`
+          `https://backend-rho-three-58.vercel.app/deliveries-buyerId/${buyerId}`
         );
 
         const data = response.data;
@@ -60,7 +60,12 @@ const BuyerOrders = () => {
                 `https://backend-rho-three-58.vercel.app/items/${order.item_id}`
               );
               const itemData = itemResponse.data[0];
-              return { ...order, item_image: itemData.image_url };
+              return {
+                ...order,
+                item_image: itemData.image_url,
+                item_name: itemData.item_name,
+                unit_price: itemData.unit_price,
+              };
               // Set loading to false after fetching
             } catch (error) {
               console.error(
@@ -136,12 +141,18 @@ const BuyerOrders = () => {
           <Image source={{ uri: item.item_image }} style={styles.itemImage} />
         )}
         <Text style={styles.orderId}>Order ID: {item.order_id}</Text>
-        <Text style={styles.detail}>Seller ID: {item.seller_id}</Text>
-        <Text style={styles.detail}>Item ID: {item.item_id}</Text>
+        <Text style={styles.detail}>Seller Name: {item.seller_name}</Text>
+        <Text style={styles.detail}>Item Name: {item.item_name}</Text>
         <Text style={styles.detail}>
           Order Date: {formatDate(item.order_date)}
         </Text>
         <Text style={styles.detail}>Quantity: {item.order_quantity}</Text>
+        <Text style={styles.detail}>
+          Total Price: Rs. {item.unit_price * item.order_quantity}.00
+        </Text>
+        <Text style={styles.detail}>
+          Delivery Address: {item.buyer_address}
+        </Text>
 
         <TouchableOpacity
           style={styles.trackButton}

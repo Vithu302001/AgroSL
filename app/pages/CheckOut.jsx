@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     position: "absolute",
     top: "50%",
-    left: "50%",
+    left: "56%",
     zIndex: 1,
     transform: [{ translateX: -25 }, { translateY: -25 }],
   },

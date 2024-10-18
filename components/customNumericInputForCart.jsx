@@ -41,7 +41,7 @@ const CustomNumericInput = ({
     <View style={styles.container}>
       {/* Decrease Button */}
       <TouchableOpacity style={styles.button} onPress={handleDecrement}>
-        <MaterialIcons name="remove" size={15} color="white" />
+        <MaterialIcons name="remove" size={12} color="white" />
       </TouchableOpacity>
 
       {/* Numeric Input */}
@@ -54,7 +54,7 @@ const CustomNumericInput = ({
 
       {/* Increase Button */}
       <TouchableOpacity style={styles.button} onPress={handleIncrement}>
-        <MaterialIcons name="add" size={15} color="white" />
+        <MaterialIcons name="add" size={12} color="white" />
       </TouchableOpacity>
     </View>
   );
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   input: {
-    width: 81,
+    width: 70,
     textAlign: "center",
     fontSize: 18,
     borderColor: "grey",

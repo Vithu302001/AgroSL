@@ -65,7 +65,7 @@ const Tracking = () => {
         `https://backend-rho-three-58.vercel.app/delivery-by-orderID/${orderID}`
       )
       .then((res) => {
-        setOrderData(res.data);
+        setOrderData(res.data[0]);
       })
       .catch((err) => {
         setError(err.message);
@@ -143,7 +143,7 @@ const Tracking = () => {
     {
       title: "Delivered to Buyer",
       description: isDeliveryConfirmed
-        ? `Delivered to buyer on ${orderData.delivered_to_sc}`
+        ? `Delivered to buyer on ${orderData.delivered_to_dc}`
         : "Not yet delivered to buyer",
       isCompleted: isDeliveryConfirmed,
     },

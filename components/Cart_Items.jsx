@@ -115,7 +115,10 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
         <View style={styles.itemDetails}>
           <Text style={styles.itemName}>{item.item_name}</Text>
           <Text style={styles.itemSeller}>Seller: {item.seller_name}</Text>
-          <Text style={styles.itemQuantity}>Quantity: {item.quantity}</Text>
+          <Text style={styles.itemSeller}>Quantity: {item.quantity}</Text>
+          <Text style={styles.itemPrice}>
+            LKR:{(item.quantity * parseFloat(item.price)).toFixed(2)}
+          </Text>
         </View>
         <CustomNumericInputForCart
           minValue={1}
@@ -123,9 +126,6 @@ const Cart_Item_View = ({ updateTotalPrice }) => {
           quantity={item.quantity}
           setQuantity={(value) => handleQuantityChange(index, value)}
         />
-        <Text style={styles.itemPrice}>
-          LKR: {(item.quantity * parseFloat(item.price)).toFixed(2)}
-        </Text>
       </View>
     </Pressable>
   );

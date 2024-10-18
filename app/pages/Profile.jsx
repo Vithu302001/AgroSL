@@ -11,11 +11,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import axios from "axios";
-import logo from "../../assets/images/AgroSL.png";
 import colors from "../../constants/colors";
 import { auth } from "../../Backend/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useNavigation } from "@react-navigation/native";
+import avatarPlaceholder from "../../assets/images/avatar.png"; // Default avatar image
 
 const BASE_URL = "https://backend-rho-three-58.vercel.app";
 
@@ -142,43 +142,71 @@ const Profile = () => {
       {user ? (
         <View style={styles.container}>
           <Text style={styles.greeting}>Hi! {user.first_name || "User"}</Text>
-          <Image source={logo} style={styles.avatar} />
+          <Image
+            source={
+              user.image_url ? { uri: user.image_url } : avatarPlaceholder
+            }
+            style={styles.avatar}
+          />
+
+          {/* User Information Fields */}
           {["first_name", "last_name", "email", "mobile_number"].map(
             (field, index) => (
-              <TextInput
-                key={index}
-                style={styles.input}
-                placeholder={field
-                  .replace("_", " ")
-                  .replace(/\b\w/g, (c) => c.toUpperCase())}
-                value={updatedUser[field] || ""}
-                editable={isEditable}
-                onChangeText={(value) => handleInputChange(field, value)}
-              />
+              <View key={index} style={styles.fieldContainer}>
+                <Text style={styles.label}>
+                  {field
+                    .replace("_", " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={`Enter ${field
+                    .replace("_", " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                  value={updatedUser[field] || ""}
+                  editable={isEditable}
+                  onChangeText={(value) => handleInputChange(field, value)}
+                />
+              </View>
             )
           )}
+
+          {/* Address Fields */}
           {["pb_number", "street_name", "city", "district"].map(
             (field, index) => (
-              <TextInput
-                key={index}
-                style={styles.input}
-                placeholder={field
-                  .replace("_", " ")
-                  .replace(/\b\w/g, (c) => c.toUpperCase())}
-                value={addressup[field]}
-                editable={isEditable}
-                onChangeText={(value) => handleAddressChange(field, value)}
-              />
+              <View key={index} style={styles.fieldContainer}>
+                <Text style={styles.label}>
+                  {field
+                    .replace("_", " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={`Enter ${field
+                    .replace("_", " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase())}`}
+                  value={addressup[field]}
+                  editable={isEditable}
+                  onChangeText={(value) => handleAddressChange(field, value)}
+                />
+              </View>
             )
           )}
+
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={handleEdit}>
+            <TouchableOpacity
+              style={[styles.button, isEditable && styles.disabledButton]}
+              onPress={handleEdit}
+              disabled={isEditable}
+            >
               <Text style={styles.buttonText}>Edit</Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.button} onPress={handleSaveClick}>
               <Text style={styles.buttonText}>Save</Text>
             </TouchableOpacity>
           </View>
+
           {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
       ) : (
@@ -221,12 +249,20 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     borderRadius: 50,
   },
-  input: {
+  fieldContainer: {
     width: "90%",
+    marginVertical: 8,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 4,
+  },
+  input: {
     borderBottomWidth: 2,
     borderColor: "#ccc",
     padding: 8,
-    marginVertical: 6,
     fontSize: 16,
     color: "black",
   },
@@ -243,6 +279,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     backgroundColor: colors.darkGreen,
     alignItems: "center",
+  },
+  disabledButton: {
+    backgroundColor: "#ccc",
   },
   buttonText: {
     color: "white",
