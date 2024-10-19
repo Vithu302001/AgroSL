@@ -27,6 +27,7 @@ const Sign_Up_Buyer = () => {
   const [phonenumber, setPhonenumber] = useState("");
   const [reenteredpassword, setReenteredpassword] = useState("");
 
+  //patterns for user input validation
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
   const namePattern = /^[A-Za-z ]+$/;
@@ -73,6 +74,7 @@ const Sign_Up_Buyer = () => {
     }
 
     try {
+      //create user account in firebase
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -92,6 +94,7 @@ const Sign_Up_Buyer = () => {
         user_type: "buyer",
       };
 
+      //store user details in postgreSQL database with uid retrieved from firebase
       await axios.post(
         "https://backend-rho-three-58.vercel.app/users",
         newUser

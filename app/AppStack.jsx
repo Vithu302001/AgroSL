@@ -22,6 +22,7 @@ import Rider_Orders from "./pages/RiderOrders";
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+//main tab navigation
 const HomeTabs = () => {
   return (
     <Tab.Navigator
@@ -54,6 +55,7 @@ const HomeTabs = () => {
   );
 };
 
+//app routes
 const AppStack = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>

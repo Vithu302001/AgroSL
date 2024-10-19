@@ -30,4 +30,4 @@ const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
 
-export { auth }; // Export the auth instance
+export { auth };

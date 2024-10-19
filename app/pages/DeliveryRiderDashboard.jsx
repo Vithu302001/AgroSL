@@ -57,25 +57,7 @@ export default function DeliveryRiderDashboard() {
       return <Rider_Orders riderId={riderId} />;
     if (selectedValue === "View Deliveries")
       return <Deliveries riderId={riderId} />;
-    if (selectedValue === "Profile")
-      return (
-        // <View style={styles.content}>
-        //   <Text style={styles.welcomeText}>
-        //     Welcome, {user?.first_name} {user?.last_name}
-        //   </Text>
-
-        //   <View style={styles.infoBox}>
-        //     <Text style={styles.infoText}>
-        //       Email: <Text style={styles.infoValue}>{user?.email}</Text>
-        //     </Text>
-        //     <Text style={styles.infoText}>
-        //       Mobile Number:{" "}
-        //       <Text style={styles.infoValue}>{user?.mobile_number}</Text>
-        //     </Text>
-        //   </View>
-        // </View>
-        <Profile />
-      );
+    if (selectedValue === "Profile") return <Profile />;
   };
 
   return (

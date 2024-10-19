@@ -57,6 +57,7 @@ function Sign_In() {
       const userType = response.data.user_type;
       console.log("User type:", userType);
 
+      //naviagate based on user type
       if (userType === "buyer") {
         navigation.navigate("HomeTabs", { userId: currentUser.uid });
       } else if (userType === "delivery_rider") {
@@ -75,7 +76,7 @@ function Sign_In() {
           );
 
           if (admin.data && admin.data.user_id) {
-            navigation.navigate("AdminDashboard");
+            alert("You can't use admin account in mobile app");
           } else {
             Alert.alert("Error", "User type not recognized.");
           }

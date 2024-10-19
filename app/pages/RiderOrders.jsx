@@ -43,7 +43,7 @@ const Rider_Orders = () => {
       }
     });
 
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const Rider_Orders = () => {
           title: "Order successfully taken",
           body: `${orderId} has been successfully taken by you.`,
         },
-        trigger: null, // Send immediately
+        trigger: null,
       });
     }
   };
@@ -138,8 +138,8 @@ const Rider_Orders = () => {
         orders.map((order) => (
           <View key={order.order_id} style={styles.card}>
             <Text style={styles.orderId}>Order ID: {order.order_id}</Text>
-            <Text style={styles.detail}>Seller Name: {order.seller_id}</Text>
-            <Text style={styles.detail}>Buyer Name: {order.buyer_id}</Text>
+            <Text style={styles.detail}>Seller ID: {order.seller_id}</Text>
+            <Text style={styles.detail}>Buyer ID: {order.buyer_id}</Text>
             <Text style={styles.detail}>From: {order.seller_address}</Text>
             <Text style={styles.detail}>To: {order.buyer_address}</Text>
             <Button

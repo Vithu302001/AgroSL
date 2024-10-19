@@ -127,7 +127,7 @@ const Tracking = () => {
     {
       title: "Delivered to Buyer",
       description: orderData.is_delivered_to_buyer
-        ? `Delivered on: ${orderData.delivered_to_dc}`
+        ? `Delivered to buyer`
         : "Not yet delivered to buyer.",
       isCompleted: orderData.is_delivered_to_buyer,
     },

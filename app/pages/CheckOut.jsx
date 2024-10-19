@@ -49,6 +49,7 @@ const CheckoutPage = () => {
     }
   };
 
+  //check the web view url change and decide further action  based on the url
   const handleNavigationStateChange = (navState) => {
     const successUrl = "https://agro-sl.vercel.app/Success";
     const errorUrl = "https://agro-sl.vercel.app/error";

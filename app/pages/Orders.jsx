@@ -33,7 +33,6 @@ const BuyerOrders = () => {
       }
     });
 
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
@@ -116,11 +115,11 @@ const BuyerOrders = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(); // Format date as MM/DD/YYYY
+    return date.toLocaleDateString(); // Format date to MM/DD/YYYY
   };
 
   const handleComplain = (order) => {
-    // Navigate to the complaint page, passing order_id and seller_id
+    // Navigate to the complaint page
     navigation.navigate("Complaint", {
       order_id: order.order_id,
       seller_id: order.seller_id,

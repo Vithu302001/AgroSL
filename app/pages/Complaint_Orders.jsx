@@ -19,7 +19,7 @@ const ComplaintPage = () => {
   const { order_id, seller_id } = route.params;
 
   const [description, setDescription] = useState("");
-  const [complainSeller, setComplainSeller] = useState(false); // Track checkbox state
+  const [complainSeller, setComplainSeller] = useState(false);
   const [error, setError] = useState("");
   const [buyerId, setBuyerId] = useState(null);
 
